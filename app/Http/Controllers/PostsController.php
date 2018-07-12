@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Post;
 
 class PostsController extends Controller
 {
@@ -18,17 +19,8 @@ class PostsController extends Controller
      */
     public function index()
     {
-        return "I am a post controller";
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        $user_id = auth()->user()->id;
+        return Post::where('user_id',$user_id)->get();
     }
 
     /**
@@ -39,7 +31,10 @@ class PostsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $user_id = auth()->user()->id;
+        $request['user_id'] = $user_id;
+        $post = post::create($request->all());
+        return $post;
     }
 
     /**
@@ -50,18 +45,7 @@ class PostsController extends Controller
      */
     public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        return Post::with(['user'])->find($id);
     }
 
     /**
@@ -73,7 +57,11 @@ class PostsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $post = post::find($id);
+        $post->title = $request->title;
+        $post->description = $request->description;
+        $post->update();
+        return $post;
     }
 
     /**
@@ -84,6 +72,7 @@ class PostsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        post::destroy($id);
+        return 'Post Destory';
     }
 }
